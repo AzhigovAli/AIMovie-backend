@@ -18,7 +18,7 @@ export class CreateMovieDto {
   @ApiProperty({
     default: 142,
   })
-  runtime: number;
+  runtime: string;
   @ApiProperty({
     default: 'Frank Darabont',
   })

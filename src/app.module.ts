@@ -5,6 +5,8 @@ import { MoviesModule } from './movies/movies.module';
 import { UserEntity } from './users/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { MovieEntity } from './movies/entities/movie.entity';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -19,12 +21,13 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [UserEntity],
+      entities: [UserEntity, MovieEntity],
       synchronize: true,
     }),
     UsersModule,
     MoviesModule,
     AuthModule,
+    AiModule,
   ],
   controllers: [],
   providers: [],
