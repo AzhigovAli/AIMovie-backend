@@ -8,8 +8,9 @@ export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
   @Get()
-  findAll() {
-    return this.moviesService.findAll();
+  @ApiQuery({ name: 'type', required: false })
+  findAll(@Query('type') type: string) {
+    return this.moviesService.findAll(type);
   }
 
   @Get('/search')

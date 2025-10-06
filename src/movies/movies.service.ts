@@ -5,37 +5,29 @@ import { MovieEntity } from './entities/movie.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpService } from '@nestjs/axios';
 import { AiService } from 'src/ai/ai.service';
-import { getMovieInfo } from 'src/utils/getMovieInfo';
-import { MovieInfo } from './types/movieInfo.type';
-import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectRepository(MovieEntity)
     private readonly moviesRepository: Repository<MovieEntity>,
-    private readonly httpService: HttpService,
     private readonly aiRepository: AiService,
   ) {}
 
   async create(dto: CreateMovieDto) {
-    const movie = this.moviesRepository.create(dto);
-    return this.moviesRepository.save(movie);
+    return this.moviesRepository.save(dto);
   }
 
-  @Cron('*/30 * * * *')
-  async findAll() {
-    const allMovies = await this.moviesRepository.find();
-
-    const { movie }: MovieInfo = await getMovieInfo(
-      this.aiRepository.createRequestAI,
-      this.httpService.axiosRef,
-      allMovies,
-    );
-
-    await this.create(movie);
-
-    return this.moviesRepository.find();
+  async findAll(type: string) {
+    try {
+      return this.moviesRepository.find({
+        where: {
+          type: In(type ? [type] : ['movie', 'series', 'cartoon']),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async aiSearch(query: string) {

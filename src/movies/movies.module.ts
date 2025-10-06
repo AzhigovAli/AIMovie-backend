@@ -4,11 +4,15 @@ import { MoviesController } from './movies.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MovieEntity } from './entities/movie.entity';
 import { AiModule } from 'src/ai/ai.module';
-import { HttpModule } from '@nestjs/axios';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   controllers: [MoviesController],
   providers: [MoviesService],
-  imports: [TypeOrmModule.forFeature([MovieEntity]), AiModule, HttpModule],
+  imports: [
+    TypeOrmModule.forFeature([MovieEntity]),
+    ScheduleModule.forRoot(),
+    AiModule,
+  ],
 })
 export class MoviesModule {}
