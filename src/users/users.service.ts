@@ -30,8 +30,4 @@ export class UsersService {
   findById(id: number) {
     return this.usersRepository.findOne({ where: { id } });
   }
-
-  deleteUser(id: number) {
-    return this.usersRepository.delete(id);
-  }
 }

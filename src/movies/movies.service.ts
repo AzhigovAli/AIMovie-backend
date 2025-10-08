@@ -3,8 +3,8 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { In, Repository } from 'typeorm';
 import { MovieEntity } from './entities/movie.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { HttpService } from '@nestjs/axios';
-import { AiService } from 'src/ai/ai.service';
+import { AiService } from '../ai/ai.service';
+import { parsedResult } from '../utils/parsedResult';
 
 @Injectable()
 export class MoviesService {
@@ -34,29 +34,13 @@ export class MoviesService {
     try {
       const movies = await this.moviesRepository.find();
 
-      const detailsStr = `
-      <title>${movies.map((m) => m.title)}</title>
-      <plot>${movies.map((m) => m.plot)}</plot>
-      `;
+      const { result } = await parsedResult(
+        query,
+        movies,
+        this.aiRepository.createRequestAI.bind(this.aiRepository),
+      );
 
-      const result = await this.aiRepository.createRequestAI([
-        {
-          role: 'system',
-          content: `Ты умный поиск по фильмам. У тебя есть список фильмов с названием и сюжетом ${detailsStr}.
-
-          <title>Тут хранятся все названия фильмов, сериалов и мультфильмов из БД</title>
-          <plot>Тут хранятся все сюжеты фильмов, сериалов и мультфильмов из БД</plot>
-
-          Ты получаешь пользовательский запрос: "${query}".
-
-          Найди только те фильмы, у которых plot или title максимально похож на запрос.
-          Верни результат строго в формате JSON массива названий фильмов: ["Название1", "Название2"].`,
-        },
-      ]);
-
-      const parsedResult = JSON.parse(result || '[]');
-
-      return this.moviesRepository.findBy({ title: In(parsedResult) });
+      return this.moviesRepository.findBy({ title: In(result) });
     } catch (error) {
       console.log(error);
     }
