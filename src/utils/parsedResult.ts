@@ -1,5 +1,14 @@
 import { MovieEntity } from 'src/movies/entities/movie.entity';
+import { getAiMessageContent } from './aiMessageContent';
 
+/**
+ * Функция для парсинга ответа AI из строки в JSON
+ *
+ * @param query Пользовательский запрос
+ * @param movies Список фильмов
+ * @param createRequestAI Функция для запроса AI
+ * @returns Массив с названиями фильмов
+ */
 export async function parsedResult(
   query: string,
   movies: MovieEntity[],
@@ -13,15 +22,7 @@ export async function parsedResult(
   const aiResult = await createRequestAI([
     {
       role: 'system',
-      content: `Ты умный поиск по фильмам. У тебя есть список фильмов с названием и сюжетом ${detailsStr}.
-
-          <title>Тут хранятся все названия фильмов, сериалов и мультфильмов из БД</title>
-          <plot>Тут хранятся все сюжеты фильмов, сериалов и мультфильмов из БД</plot>
-
-          Ты получаешь пользовательский запрос: "${query}".
-
-          Найди только те фильмы, у которых plot или title максимально похож на запрос.
-          Верни результат строго в формате JSON массива названий фильмов: ["Название1", "Название2"].`,
+      content: getAiMessageContent(query, detailsStr),
     },
   ]);
 

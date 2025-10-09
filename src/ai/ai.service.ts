@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
+import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
 
 @Injectable()
 export class AiService {
-  async createRequestAI(messages: any[]) {
+  /**
+   *
+   * @param messages {}
+   * @returns
+   */
+  async createRequestAI(messages: ChatCompletionCreateParamsBase['messages']) {
     try {
       const client = new OpenAI({
         baseURL: 'https://router.huggingface.co/v1',

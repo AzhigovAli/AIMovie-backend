@@ -1,35 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMovieDto } from './dto/create-movie.dto';
 import { In, Repository } from 'typeorm';
-import { MovieEntity } from './entities/movie.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MovieEntity } from './entities/movie.entity';
+import { CreateMovieDto } from './dto/create-movie.dto';
 import { AiService } from '../ai/ai.service';
 import { parsedResult } from '../utils/parsedResult';
+
+const DEFAULT_MOVIE_TYPES = ['movie', 'series', 'cartoon'];
 
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectRepository(MovieEntity)
     private readonly moviesRepository: Repository<MovieEntity>,
-    private readonly aiRepository: AiService,
+    private readonly aiService: AiService,
   ) {}
 
+  /**
+   * Создаёт новый фильм в базе данных
+   * @param dto - данные нового фильма
+   */
   async create(dto: CreateMovieDto) {
     return this.moviesRepository.save(dto);
   }
 
-  async findAll(type: string) {
+  /**
+   * Возвращает все фильмы определённого типа или всех типов по умолчанию
+   * @param type - тип фильма (movie | series | cartoon)
+   */
+  async findAll(type?: 'movie' | 'series' | 'cartoon') {
     try {
+      if (type) {
+        return this.moviesRepository.find({ where: { type } });
+      }
+
       return this.moviesRepository.find({
-        where: {
-          type: In(type ? [type] : ['movie', 'series', 'cartoon']),
-        },
+        where: { type: In(['movie', 'series', 'cartoon']) },
       });
     } catch (error) {
-      console.log(error);
+      console.error('Error in findAll:', error);
+      throw error;
     }
   }
 
+  /**
+   * Выполняет поиск фильмов с помощью AI по текстовому запросу
+   * @param query - текст запроса пользователя
+   */
   async aiSearch(query: string) {
     try {
       const movies = await this.moviesRepository.find();
@@ -37,12 +54,13 @@ export class MoviesService {
       const { result } = await parsedResult(
         query,
         movies,
-        this.aiRepository.createRequestAI.bind(this.aiRepository),
+        this.aiService.createRequestAI.bind(this.aiService),
       );
 
       return this.moviesRepository.findBy({ title: In(result) });
     } catch (error) {
-      console.log(error);
+      console.error('Error in aiSearch:', error);
+      throw error;
     }
   }
 }

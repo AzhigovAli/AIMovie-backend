@@ -15,14 +15,7 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<{ email: string; fullName: string } | null> {
-    const user = await this.usersService.findByEmail(email);
-
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return result;
-    }
-
-    return null;
+    return this.usersService.validateUser(email, password);
   }
 
   async register(dto: CreateUserDto) {

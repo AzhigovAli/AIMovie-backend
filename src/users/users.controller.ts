@@ -14,6 +14,6 @@ export class UsersController {
 
   @Get(':id')
   getMe(@Body() id: number) {
-    return this.usersService.getMe(id);
+    return this.usersService.findById(id);
   }
 }
