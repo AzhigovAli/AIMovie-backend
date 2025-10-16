@@ -6,8 +6,6 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { AiService } from '../ai/ai.service';
 import { parsedResult } from '../utils/parsedResult';
 
-const DEFAULT_MOVIE_TYPES = ['movie', 'series', 'cartoon'];
-
 @Injectable()
 export class MoviesService {
   constructor(
@@ -60,6 +58,19 @@ export class MoviesService {
       return this.moviesRepository.findBy({ title: In(result) });
     } catch (error) {
       console.error('Error in aiSearch:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Возвращает фильм по его ID
+   * @param id - ID фильма
+   */
+  async findById(id: number) {
+    try {
+      return this.moviesRepository.findOneBy({ id });
+    } catch (error) {
+      console.error('Error in findById:', error);
       throw error;
     }
   }

@@ -15,18 +15,29 @@ export async function parsedResult(
   createRequestAI: Function,
 ): Promise<{ result: string[] }> {
   const detailsStr = `
-      <title>${movies.map((m) => m.title)}</title>
-      <plot>${movies.map((m) => m.plot)}</plot>
-      `;
+<title>${movies.map((m) => m.title)}</title>
+<plot>${movies.map((m) => m.plot)}</plot>
+`;
 
-  const aiResult = await createRequestAI([
+  const aiResultRaw = await createRequestAI([
     {
       role: 'system',
       content: getAiMessageContent(query, detailsStr),
     },
   ]);
 
-  const result = JSON.parse(aiResult || '[]');
+  const aiResultClean = aiResultRaw
+    ?.replace(/```json/g, '')
+    ?.replace(/```/g, '')
+    ?.trim();
+
+  let result: string[] = [];
+  try {
+    result = JSON.parse(aiResultClean || '[]');
+  } catch (err) {
+    console.warn('AI вернул некорректный JSON:', aiResultRaw);
+    result = [];
+  }
 
   return { result };
 }

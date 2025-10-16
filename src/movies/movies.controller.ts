@@ -27,4 +27,14 @@ export class MoviesController {
   async aiSearch(@Query('query') query: string) {
     return this.moviesService.aiSearch(query);
   }
+
+  /**
+   * Возвращает фильм по его ID
+   * @param id ID фильма
+   * @returns Фильм
+   */
+  @Get(':id')
+  findById(@Query('id') id: number) {
+    return this.moviesService.findById(id);
+  }
 }
