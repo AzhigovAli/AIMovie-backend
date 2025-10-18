@@ -29,12 +29,16 @@ export class MoviesController {
   }
 
   /**
-   * Возвращает фильм по его ID
+   * Получение фильма по его ID
    * @param id ID фильма
+   * @param type Тип фильма
    * @returns Фильм
    */
   @Get(':id')
-  findById(@Query('id') id: number) {
-    return this.moviesService.findById(id);
+  async findById(
+    @Query('id') id: number,
+    @Query('type') type: 'movie' | 'series' | 'cartoon',
+  ) {
+    return this.moviesService.findById(id, type);
   }
 }

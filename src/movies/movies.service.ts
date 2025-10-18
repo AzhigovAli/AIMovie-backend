@@ -66,9 +66,9 @@ export class MoviesService {
    * Возвращает фильм по его ID
    * @param id - ID фильма
    */
-  async findById(id: number) {
+  async findById(id: number, type?: 'movie' | 'series' | 'cartoon') {
     try {
-      return this.moviesRepository.findOneBy({ id });
+      return this.moviesRepository.findOneBy({ id, type: type });
     } catch (error) {
       console.error('Error in findById:', error);
       throw error;
